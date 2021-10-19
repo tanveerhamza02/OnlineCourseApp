@@ -77,7 +77,7 @@ class Lesson(models.Model):
 
 
 # Enrollment model
-#<HINT> Once a user enrolled a class, an enrollment entry should be created between the user and course
+# <HINT> Once a user enrolled a class, an enrollment entry should be created between the user and course
 # And we could use the enrollment to track information such as exam submissions
 class Enrollment(models.Model):
     AUDIT = 'audit'
@@ -102,21 +102,21 @@ class Enrollment(models.Model):
     # Has question content
     # Other fields and methods you would like to design
 class Question(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     # Foreign key to lesson
-    question = models.CharField(max_length=200, default="question")
-    grade = models.IntegerField()
+    related_lesson = models.ForeignKey(Lesson, on_delete = models.CASCADE)
     # question text
+    text = models.CharField(max_length = 2000)
     # question grade/mark
-
+    grade = models.IntegerField(default = 0)
+    courses = models.ManyToManyField(Course)
     # <HINT> A sample model method to calculate if learner get the score of the question
     def is_get_score(self, selected_ids):
-        all_answers = self.choice_set.filter(is_correct=True).count()
-        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
-        if all_answers == selected_correct:
-            return True
-        else:
-            return False
+       all_answers = self.choice_set.filter(is_correct=True).count()
+       selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
+       if all_answers == selected_correct:
+           return True
+       else:
+           return False
 
 
 #  <HINT> Create a Choice Model with:
@@ -126,17 +126,15 @@ class Question(models.Model):
     # Indicate if this choice of the question is a correct one or not
     # Other fields and methods you would like to design
 class Choice(models.Model):
+    question_id = models.ManyToManyField(Question)
+    content = models.TextField()
+    is_correct = models.BooleanField()
 
 # <HINT> The submission model
-    question = models.ManyToManyField(Question)
-    choice = models.CharField(max_length=200, default="choice")
-    
 # One enrollment could have multiple submission
 # One submission could have multiple choices
 # One choice could belong to multiple submissions
-
-
 class Submission(models.Model):
-    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
-    choices = models.ManyToManyField(Choice)
-#    Other fields and methods you would 
+   enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+   chocies = models.ManyToManyField(Choice)
+#    Other fields and methods you would like to design
